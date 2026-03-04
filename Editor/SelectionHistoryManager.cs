@@ -38,12 +38,7 @@ namespace Besttof.SelectionHistory
 
 		private void Initialize()
 		{
-			_history = _selectionMode switch
-			{
-				SelectionMode.FastAndNaive   => new HistoryBuffer<Object[]>(_capacity),
-				SelectionMode.SlowAndCorrect => new SlowHistoryBuffer(_capacity),
-				_                            => throw new ArgumentOutOfRangeException(nameof(_selectionMode), _selectionMode, "Unknown selection mode"),
-			};
+			_history = HistoryBuffer.Create(_capacity, _selectionMode);
 		}
 
 		private void OnEnable()
