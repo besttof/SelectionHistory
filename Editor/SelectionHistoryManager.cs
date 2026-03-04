@@ -26,6 +26,9 @@ namespace Besttof.SelectionHistory
 		[Shortcut("Selection History/Next Selection", KeyCode.Equals, ShortcutModifiers.Action | ShortcutModifiers.Shift)]
 		static void HandleNextShortcut(ShortcutArguments args) => instance.SelectNext();
 
+		[Shortcut("Selection History/Clear History", KeyCode.Backslash, ShortcutModifiers.Action | ShortcutModifiers.Shift)]
+		static void HandleClearShortcut(ShortcutArguments args) => instance.Clear();
+
 		[InitializeOnLoadMethod]
 		private static void InitializeInstance()
 		{
@@ -39,14 +42,7 @@ namespace Besttof.SelectionHistory
 
 		private void OnEnable()
 		{
-			// Start with a selection clear
-			_history.Push(Array.Empty<Object>());
-
-			// Push current selection
-			if (Selection.count != 0)
-			{
-				_history.Push(Selection.objects);
-			}
+			Clear();
 
 			Selection.selectionChanged += OnSelectionChanged;
 			EditorSceneManager.sceneOpening += OnSceneOpening;
@@ -145,6 +141,20 @@ namespace Besttof.SelectionHistory
 			else
 			{
 				EditorApplication.Beep();
+			}
+		}
+
+		private void Clear()
+		{
+			_history.Clear();
+			
+			// Start with nothing selected
+			_history.Push(Array.Empty<Object>());
+
+			// Push the active selection if it exists
+			if (Selection.count != 0)
+			{
+				_history.Push(Selection.objects);
 			}
 		}
 
