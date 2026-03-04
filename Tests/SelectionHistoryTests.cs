@@ -70,5 +70,16 @@ namespace Besttof.SelectionHistory
 			
 			Assert.That(result, Is.False);
 		}
+		
+		[Test]
+		public void SequenceEquals_EmptyAndNull_IsCorrect()
+		{
+			var sequence1 = new Object[] { null, null, null};
+			var sequence2 = new Object[] { };
+			
+			var result = SelectionHistoryManager.SequenceEquals(sequence1, sequence2);
+			
+			Assert.That(result, Is.True);
+		}
 	}
 }

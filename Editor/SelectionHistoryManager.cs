@@ -64,13 +64,16 @@ namespace Besttof.SelectionHistory
 
 			Save(true);
 
+		/// <summary>
+		/// Checks if two sequences are equal, also considers empty and all null sequences equal
+		/// </summary>
 		internal static bool SequenceEquals<T>(T[] a, T[] b) where T : Object
 		{
-			if (a.Length != b.Length) return false;
-
-			for (var i = 0; i < a.Length; i++)
+			for (var i = 0; i < Math.Max(a.Length, b.Length); i++)
 			{
-				if (a[i] != b[i]) return false;
+				var ai = i < a.Length ? a[i] : null;
+				var bi = i < b.Length ? b[i] : null;
+				if (ai != bi) return false;
 			}
 
 			return true;
