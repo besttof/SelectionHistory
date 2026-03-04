@@ -14,7 +14,7 @@ namespace Besttof.SelectionHistory
 		[Delayed]
 		[SerializeField] private int _capacity = 25;
 
-		[SerializeField] private bool _clearHistoryOnSceneChange = false;
+		[SerializeField] private bool _clearHistoryOnSceneChange = true;
 		[SerializeField] private bool _ignoreEmptySelections = false;
 		[SerializeField] private SelectionMode _selectionMode = SelectionMode.FastAndNaive;
 
