@@ -66,6 +66,17 @@ namespace Besttof.SelectionHistory
 			}
 
 			Save(true);
+
+		internal static bool SequenceEquals<T>(T[] a, T[] b) where T : Object
+		{
+			if (a.Length != b.Length) return false;
+
+			for (var i = 0; i < a.Length; i++)
+			{
+				if (a[i] != b[i]) return false;
+			}
+
+			return true;
 		}
 
 		private void OnSelectionChanged()
@@ -154,18 +165,6 @@ namespace Besttof.SelectionHistory
 		private static string GetSelectionName(Object[] objects)
 		{
 			return string.Join(", ", Array.ConvertAll(objects, o => o.name));
-		}
-
-		private static bool SequenceEquals<T>(T[] a, T[] b) where T : Object
-		{
-			if (a.Length != b.Length) return false;
-
-			for (var i = 0; i < a.Length; i++)
-			{
-				if (a != b) return false;
-			}
-
-			return true;
 		}
 	}
 }

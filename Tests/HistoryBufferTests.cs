@@ -1,10 +1,9 @@
-using Besttof.SelectionHistory;
 using NUnit.Framework;
 
 namespace Besttof.SelectionHistory
 {
 	[TestFixture]
-	public class HistoryBufferTest
+	public class HistoryBufferTests
 	{
 		[Test]
 		public void Push_IncreasesCount()
