@@ -156,7 +156,7 @@ namespace Besttof.SelectionHistory
 			return string.Join(", ", Array.ConvertAll(objects, o => o.name));
 		}
 
-		private static bool SequenceEquals(Object[] a, Object[] b)
+		private static bool SequenceEquals<T>(T[] a, T[] b) where T : Object
 		{
 			if (a.Length != b.Length) return false;
 
