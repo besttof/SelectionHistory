@@ -17,7 +17,7 @@ namespace Besttof.SelectionHistory
 		[SerializeField] private bool _clearHistoryOnSceneChange = false;
 		[SerializeField] private bool _ignoreEmptySelections = false;
 
-		private HistoryBuffer<Object[]> _history = new(25);
+		private IHistoryBuffer<Object[]> _history;
 		private bool _ignoreCallbackOnce;
 
 		[Shortcut("Selection History/Previous Selection", KeyCode.Minus, ShortcutModifiers.Action | ShortcutModifiers.Shift)]

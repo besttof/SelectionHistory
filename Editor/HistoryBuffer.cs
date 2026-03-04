@@ -5,15 +5,15 @@ using System.Runtime.CompilerServices;
 
 namespace Besttof.SelectionHistory
 {
-	internal class HistoryBuffer<T> : IEnumerable<T>
+	internal class HistoryBuffer<T> : IHistoryBuffer<T>
 	{
 		private readonly T[] _buffer;
 		private int _head;
 		private int _count;
 		private int _cursor;
 
-		internal int Count => _count;
-		internal int Capacity => _buffer.Length;
+		public int Count => _count;
+		public int Capacity => _buffer.Length;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private int PhysicalIndex(int logical) => (_head + logical) % Capacity;
@@ -24,7 +24,7 @@ namespace Besttof.SelectionHistory
 			Clear();
 		}
 
-		internal void Clear()
+		public void Clear()
 		{
 			_head = 0;
 			_count = 0;
@@ -33,7 +33,7 @@ namespace Besttof.SelectionHistory
 			Array.Fill(_buffer, default);
 		}
 
-		internal void Push(T value)
+		public void Push(T value)
 		{
 			// Truncate the count to the cursor position
 			_count = _cursor + 1;
@@ -53,7 +53,7 @@ namespace Besttof.SelectionHistory
 			_cursor = _count - 1;
 		}
 
-		internal bool TryGetCurrent(out T value)
+		public bool TryGetCurrent(out T value)
 		{
 			value = default;
 			if (_count == 0) return false;
@@ -62,7 +62,7 @@ namespace Besttof.SelectionHistory
 			return true;
 		}
 
-		internal bool TryGoBack(out T value)
+		public bool TryGoBack(out T value)
 		{
 			value = default;
 			if (_cursor <= 0) return false;
@@ -72,7 +72,7 @@ namespace Besttof.SelectionHistory
 			return true;
 		}
 
-		internal bool TryGoForward(out T value)
+		public bool TryGoForward(out T value)
 		{
 			value = default;
 			if (_cursor >= _count - 1) return false;
