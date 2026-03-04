@@ -16,6 +16,7 @@ namespace Besttof.SelectionHistory
 
 		[SerializeField] private bool _clearHistoryOnSceneChange = false;
 		[SerializeField] private bool _ignoreEmptySelections = false;
+		[SerializeField] private SelectionMode _selectionMode = SelectionMode.FastAndNaive;
 
 		private IHistoryBuffer<Object[]> _history;
 		private bool _ignoreCallbackOnce;
@@ -37,7 +38,12 @@ namespace Besttof.SelectionHistory
 
 		private void Initialize()
 		{
-			_history = new HistoryBuffer<Object[]>(_capacity);
+			_history = _selectionMode switch
+			{
+				SelectionMode.FastAndNaive   => new HistoryBuffer<Object[]>(_capacity),
+				SelectionMode.SlowAndCorrect => new SlowHistoryBuffer(_capacity),
+				_                            => throw new ArgumentOutOfRangeException(nameof(_selectionMode), _selectionMode, "Unknown selection mode"),
+			};
 		}
 
 		private void OnEnable()
