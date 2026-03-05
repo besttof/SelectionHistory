@@ -63,6 +63,7 @@ namespace Besttof.SelectionHistory
 			}
 
 			Save(true);
+		}
 
 		/// <summary>
 		/// Checks if two sequences are equal, also considers empty and all null sequences equal
@@ -164,14 +165,6 @@ namespace Besttof.SelectionHistory
 
 		private void SelectObjects(Object[] objectsToSelect)
 		{
-			Debug.Log($"Selecting objects:");
-			for (int i = 0; i < objectsToSelect.Length; i++)
-			{
-				var o = objectsToSelect[i];
-
-				Debug.Log($"	> {o}");
-			}
-
 			_ignoreCallbackOnce = true;
 			Selection.objects = objectsToSelect;
 		}
