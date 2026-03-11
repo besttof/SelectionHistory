@@ -9,7 +9,7 @@ namespace Besttof.SelectionHistory
 		[SettingsProvider]
 		public static SettingsProvider CreateSettingsProvider()
 		{
-			return new SettingsProvider("Preferences/besttof/", SettingsScope.User)
+			return new SettingsProvider("Preferences/besttof/SelectionHistorySettings", SettingsScope.User)
 			       {
 				       label = "Selection History",
 				       keywords = new HashSet<string>(new[] { "selection", "history" }),
