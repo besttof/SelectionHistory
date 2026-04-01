@@ -31,15 +31,15 @@ namespace Besttof.SelectionHistory
 		static void HandleClearShortcut(ShortcutArguments args) => instance.Clear();
 
 		[InitializeOnLoadMethod]
-		private static void InitializeInstance()
+		private static void EnsureInstanceIsCreated()
 		{
-			instance.Initialize();
+			// Enforce the side effects of calling the instance.
+			_ = instance;
 		}
 
-		private void Initialize()
-		{
-			_history = HistoryBuffer.Create(_capacity, _selectionMode);
-		}
+		private void Initialize() => _history = HistoryBuffer.Create(_capacity, _selectionMode);
+
+		private void Awake() => Initialize();
 
 		private void OnEnable()
 		{
