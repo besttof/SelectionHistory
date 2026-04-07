@@ -37,12 +37,11 @@ namespace Besttof.SelectionHistory
 			_ = instance;
 		}
 
-		private void Initialize() => _history = HistoryBuffer.Create(_capacity, _selectionMode);
-
-		private void Awake() => Initialize();
+		private void Initialize() => _history ??= HistoryBuffer.Create(_capacity, _selectionMode);
 
 		private void OnEnable()
 		{
+			Initialize();
 			Clear();
 
 			Selection.selectionChanged += OnSelectionChanged;
@@ -152,7 +151,7 @@ namespace Besttof.SelectionHistory
 		private void Clear()
 		{
 			_history.Clear();
-			
+
 			// Start with nothing selected
 			_history.Push(Array.Empty<Object>());
 
