@@ -7,7 +7,7 @@ namespace Besttof.SelectionHistory
 	{
 		internal static IHistoryBuffer<T> CreateRaw<T>(int capacity)
 		{
-			return new HistoryBuffer<T, NoSlot<T>>(capacity, new NoSlot<T>.Converter());
+			return new HistoryBuffer<T, ValueSlot<T>>(capacity);
 		}
 
 		[Test]

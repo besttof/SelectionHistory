@@ -5,15 +5,11 @@ using Object = UnityEngine.Object;
 namespace Besttof.SelectionHistory
 {
 	[Serializable]
-	internal class ObjectSlot : IBufferSlot
+	internal struct ObjectSlot : IBufferSlot<Object[]>
 	{
 		[SerializeField] public Object[] Value;
-		
-		[Serializable]
-		internal class Converter : IBufferConverter<Object[], ObjectSlot>
-		{
-			public ObjectSlot ToBuffer(Object[] value) => new() { Value = value };
-			public Object[] FromBuffer(ObjectSlot slot) => slot?.Value ?? Array.Empty<Object>();
-		}
+
+		public void Set(Object[] value) => Value = value;
+		public Object[] Get() => Value ?? Array.Empty<Object>();
 	}
 }
