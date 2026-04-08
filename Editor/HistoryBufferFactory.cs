@@ -19,10 +19,5 @@ namespace Besttof.SelectionHistory
 				_                            => throw new ArgumentOutOfRangeException()
 			};
 		}
-
-		internal static IHistoryBuffer<T> CreateRaw<T>(int capacity)
-		{
-			return new HistoryBuffer<T, NoSlot<T>>(capacity, new NoSlot<T>.Converter());
-		}
 	}
 }
