@@ -3,12 +3,19 @@ using System.Runtime.CompilerServices;
 
 namespace Besttof.SelectionHistory
 {
-	internal class NoConverter<T> : IBufferConverter<T, T>
+	[Serializable]
+	internal class NoSlot<T> : IBufferSlot
 	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public T ToBuffer(T value) => value;
+		public T Value;
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public T FromBuffer(T bufferValue) => bufferValue;
+		[Serializable]
+		internal class Converter : IBufferConverter<T, NoSlot<T>>
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public NoSlot<T> ToBuffer(T value) => new() { Value = value };
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			public T FromBuffer(NoSlot<T> slot) => slot.Value;
+		}
 	}
 }

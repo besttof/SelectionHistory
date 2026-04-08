@@ -18,7 +18,7 @@ namespace Besttof.SelectionHistory
 		[SerializeField] private bool _ignoreEmptySelections = false;
 		[SerializeField] private SelectionMode _selectionMode = SelectionMode.FastAndNaive;
 
-		private IHistoryBuffer<Object[]> _history;
+		[SerializeReference] private IHistoryBuffer<Object[]> _history;
 		private bool _ignoreCallbackOnce;
 
 		[Shortcut("Selection History/Previous Selection", KeyCode.Minus, ShortcutModifiers.Action | ShortcutModifiers.Shift)]
@@ -37,12 +37,17 @@ namespace Besttof.SelectionHistory
 			_ = instance;
 		}
 
-		private void Initialize() => _history ??= HistoryBuffer.Create(_capacity, _selectionMode);
+		private void Initialize()
+		{
+			if (_history != null) return;
+
+			_history = HistoryBufferFactory.Create(_capacity, _selectionMode);
+			Clear();
+		}
 
 		private void OnEnable()
 		{
 			Initialize();
-			Clear();
 
 			Selection.selectionChanged += OnSelectionChanged;
 			EditorSceneManager.sceneOpening += OnSceneOpening;
@@ -62,6 +67,7 @@ namespace Besttof.SelectionHistory
 			}
 
 			Save(true);
+			Debug.Log("Saved to: " + GetFilePath());
 		}
 
 		/// <summary>
@@ -93,7 +99,7 @@ namespace Besttof.SelectionHistory
 		{
 			if (mode == OpenSceneMode.Single && _clearHistoryOnSceneChange)
 			{
-				_history.Clear();
+				Clear();
 			}
 		}
 

@@ -2,120 +2,112 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using UnityEditor;
-using Object = UnityEngine.Object;
+using UnityEngine;
 
 namespace Besttof.SelectionHistory
 {
-	internal static class HistoryBuffer
+	[Serializable]
+	internal class HistoryBuffer<T, TBuffer> : IHistoryBuffer<T>, ISerializationCallbackReceiver //where TBuffer : IBufferSlot
 	{
-		internal static IHistoryBuffer<Object[]> Create(int capacity, SelectionMode mode = SelectionMode.FastAndNaive)
+		[SerializeField] private TBuffer[] _buffer;
+		[SerializeReference] private IBufferConverter<T, TBuffer> _converter;
+
+		[SerializeField] private int _head;
+		[SerializeField] private int _count;
+		[SerializeField] private int _cursor;
+
+		public int Count => _count;
+		public int Capacity => _buffer.Length;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private int PhysicalIndex(int logical) => (_head + logical) % Capacity;
+
+		internal HistoryBuffer(int capacity, IBufferConverter<T, TBuffer> converter)
 		{
-			return mode switch
-			{
-				SelectionMode.FastAndNaive   => new Buffer<Object[], Object[]>(capacity, new NoConverter<Object[]>()),
-				SelectionMode.SlowAndCorrect => new Buffer<Object[], GlobalObjectId[]>(capacity, new GlobalIdConverter()),
-				_                            => throw new ArgumentOutOfRangeException()
-			};
+			_buffer = new TBuffer[capacity];
+			_converter = converter;
+			Clear();
 		}
 
-		internal static IHistoryBuffer<T> CreateRaw<T>(int capacity)
+		public void Clear()
 		{
-			return new Buffer<T, T>(capacity, new NoConverter<T>());
+			_head = 0;
+			_count = 0;
+			_cursor = -1;
+
+			Array.Fill(_buffer, default);
 		}
 
-		private class Buffer<T, TBuffer> : IHistoryBuffer<T>
+		public void Push(T value)
 		{
-			private readonly TBuffer[] _buffer;
-			private readonly IBufferConverter<T, TBuffer> _converter;
+			// Truncate the count to the cursor position
+			_count = _cursor + 1;
 
-			private int _head;
-			private int _count;
-			private int _cursor;
-
-			public int Count => _count;
-			public int Capacity => _buffer.Length;
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			private int PhysicalIndex(int logical) => (_head + logical) % Capacity;
-
-			internal Buffer(int capacity, IBufferConverter<T, TBuffer> converter)
+			if (_count < Capacity)
 			{
-				_buffer = new TBuffer[capacity];
-				_converter = converter;
-				Clear();
+				_buffer[PhysicalIndex(_count)] = _converter.ToBuffer(value);
+				_count++;
+			}
+			else
+			{
+				// When at capacity, overwrite the oldest value and move the head forward
+				_buffer[PhysicalIndex(0)] = _converter.ToBuffer(value);
+				_head = PhysicalIndex(1);
 			}
 
-			public void Clear()
+			_cursor = _count - 1;
+		}
+
+		public bool TryGetCurrent(out T value)
+		{
+			value = default;
+			if (_count == 0) return false;
+
+			value = _converter.FromBuffer(_buffer[PhysicalIndex(_cursor)]);
+			return true;
+		}
+
+		public bool TryGoBack(out T value)
+		{
+			value = default;
+			if (_cursor <= 0) return false;
+
+			_cursor--;
+			value = _converter.FromBuffer(_buffer[PhysicalIndex(_cursor)]);
+			return true;
+		}
+
+		public bool TryGoForward(out T value)
+		{
+			value = default;
+			if (_cursor >= _count - 1) return false;
+
+			_cursor++;
+			value = _converter.FromBuffer(_buffer[PhysicalIndex(_cursor)]);
+			return true;
+		}
+
+		public IEnumerator<T> GetEnumerator()
+		{
+			for (int i = 0; i < _count; i++)
 			{
-				_head = 0;
-				_count = 0;
-				_cursor = -1;
-
-				Array.Fill(_buffer, default);
+				yield return _converter.FromBuffer(_buffer[PhysicalIndex(i)]);
 			}
+		}
 
-			public void Push(T value)
-			{
-				// Truncate the count to the cursor position
-				_count = _cursor + 1;
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
 
-				if (_count < Capacity)
-				{
-					_buffer[PhysicalIndex(_count)] = _converter.ToBuffer(value);
-					_count++;
-				}
-				else
-				{
-					// When at capacity, overwrite the oldest value and move the head forward
-					_buffer[PhysicalIndex(0)] = _converter.ToBuffer(value);
-					_head = PhysicalIndex(1);
-				}
+		public void OnBeforeSerialize()
+		{
+			Debug.Log($"OnBeforeSerialize");
+		}
 
-				_cursor = _count - 1;
-			}
-
-			public bool TryGetCurrent(out T value)
-			{
-				value = default;
-				if (_count == 0) return false;
-
-				value = _converter.FromBuffer(_buffer[PhysicalIndex(_cursor)]);
-				return true;
-			}
-
-			public bool TryGoBack(out T value)
-			{
-				value = default;
-				if (_cursor <= 0) return false;
-
-				_cursor--;
-				value = _converter.FromBuffer(_buffer[PhysicalIndex(_cursor)]);
-				return true;
-			}
-
-			public bool TryGoForward(out T value)
-			{
-				value = default;
-				if (_cursor >= _count - 1) return false;
-
-				_cursor++;
-				value = _converter.FromBuffer(_buffer[PhysicalIndex(_cursor)]);
-				return true;
-			}
-
-			public IEnumerator<T> GetEnumerator()
-			{
-				for (int i = 0; i < _count; i++)
-				{
-					yield return _converter.FromBuffer(_buffer[PhysicalIndex(i)]);
-				}
-			}
-
-			IEnumerator IEnumerable.GetEnumerator()
-			{
-				return ((IEnumerable<T>) this).GetEnumerator();
-			}
+		public void OnAfterDeserialize()
+		{
+			Debug.Log($"OnAfterDeserialize");
 		}
 	}
 }
